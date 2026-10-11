@@ -134,6 +134,59 @@ def test_formatter_redacts_password_and_omits_exception_payloads() -> None:
         assert value not in line
 
 
+@pytest.mark.parametrize("secret", ['private@:/?#\\" секрет', '"', "\\", "200"])
+def test_formatter_redacts_nested_strings_without_changing_json_structure(
+    secret: str,
+) -> None:
+    encoded = json.dumps(secret, ensure_ascii=False)[1:-1]
+    ascii_encoded = json.dumps(secret, ensure_ascii=True)[1:-1]
+
+    def crash() -> None:
+        raise RuntimeError("exception text must remain omitted")
+
+    crash.__code__ = crash.__code__.replace(
+        co_filename=f"/private/{encoded}/handler.py", co_name=f"handle_{secret}"
+    )
+    with pytest.raises(RuntimeError) as caught:
+        crash()
+    error = caught.value
+    record = logging.LogRecord(
+        f"logger.{secret}",
+        logging.ERROR,
+        __file__,
+        1,
+        "Encoded password=%s",
+        (ascii_encoded,),
+        (type(error), error, error.__traceback__),
+    )
+    record.path = f"/private/{quote(secret, safe='')}/"
+    record.status = 200
+    record.duration_ms = 12.5
+    record.invalid_settings = [{"field": f"db_{secret}", "type": "value_error"}]
+
+    line = JsonFormatter(secret).format(record)
+    payload = json.loads(line)
+    assert len(line.splitlines()) == 1
+    assert payload["logger"] == "logger.[REDACTED]"
+    assert payload["message"] == "Encoded password=[REDACTED]"
+    assert payload["path"] == "/private/[REDACTED]/"
+    assert payload["status"] == 200
+    assert payload["duration_ms"] == 12.5
+    assert payload["invalid_settings"] == [
+        {"field": "db_[REDACTED]", "type": "value_error"}
+    ]
+    assert payload["exception"]["type"] == "RuntimeError"
+    assert payload["exception"]["frames"][-1] == {
+        "file": "/private/[REDACTED]/handler.py",
+        "line": crash.__code__.co_firstlineno + 1,
+        "function": "handle_[REDACTED]",
+    }
+    assert "exception text must remain omitted" not in line
+    # Other handlers receive the original record and its nested values.
+    assert record.__dict__["path"] == f"/private/{quote(secret, safe='')}/"
+    assert record.__dict__["invalid_settings"][0]["field"] == f"db_{secret}"
+
+
 @pytest.mark.parametrize("supplied", [None, "invalid", "x" * 36, str(uuid4())])
 def test_request_id_and_access_log(
     client: TestClient,

@@ -15,7 +15,14 @@ class JsonFormatter(logging.Formatter):
     def __init__(self, password: str = "") -> None:
         super().__init__()
         self.secrets = sorted(
-            {password, quote(password, safe=""), quote_plus(password, safe="")} - {""},
+            {
+                password,
+                quote(password, safe=""),
+                quote_plus(password, safe=""),
+                json.dumps(password, ensure_ascii=False)[1:-1],
+                json.dumps(password, ensure_ascii=True)[1:-1],
+            }
+            - {""},
             key=len,
             reverse=True,
         )
@@ -55,14 +62,20 @@ class JsonFormatter(logging.Formatter):
                 else [],
             }
 
-        # Redact before JSON encoding so passwords with quotes/backslashes match.
-        def redact(value: str) -> str:
-            for secret in self.secrets:
-                value = value.replace(secret, "[REDACTED]")
+        # Redact all string values, including nested frames, before encoding.
+        # Replacing text in the final JSON could corrupt its syntax or numbers.
+        def redact(value: object) -> object:
+            if isinstance(value, str):
+                for secret in self.secrets:
+                    value = value.replace(secret, "[REDACTED]")
+                return value
+            if isinstance(value, list):
+                return [redact(item) for item in value]
+            if isinstance(value, dict):
+                return {key: redact(item) for key, item in value.items()}
             return value
 
-        payload["message"] = redact(str(payload["message"]))
-        return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+        return json.dumps(redact(payload), ensure_ascii=False, separators=(",", ":"))
 
 
 def configure_logging(level: str = "INFO", password: str = "") -> None:
