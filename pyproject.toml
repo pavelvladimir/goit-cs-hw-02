@@ -1,0 +1,66 @@
+[project]
+name = "goit-cs-hw-02"
+version = "0.1.0"
+description = "Bash website checks and a containerized FastAPI application"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "fastapi>=0.143.0,<1",
+    "psycopg2-binary>=2.9.13,<3",
+    "pydantic>=2.14.0,<3",
+    "pydantic-settings>=2.15.0,<3",
+    "sqlalchemy>=2.1.4,<3",
+    "uvicorn>=0.54.0,<1",
+]
+
+[dependency-groups]
+bash-test = [
+    "pytest>=9.1.1,<10",
+    "shellcheck-py>=0.11.0.1,<0.12",
+]
+dev = [
+    {include-group = "bash-test"},
+    "coverage>=7.16.2,<8",
+    "httpx2>=2.13.1,<3",
+    "mypy>=2.4.0,<3",
+    "pip-audit>=2.10.1,<3",
+    "python-dotenv>=1.2.4,<2",
+    "ruff>=0.17.0,<1",
+]
+
+[tool.uv]
+package = false
+prerelease = "disallow"
+
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.13"
+plugins = ["pydantic.mypy"]
+strict = true
+files = ["main.py", "conf", "tests", "scripts"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+filterwarnings = ["error"]
+markers = ["integration: real Percona 17 and distroless API in disposable Docker containers"]
+
+[tool.coverage.run]
+branch = true
+source = ["main", "conf"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 90
+exclude_also = ['if __name__ == "__main__":']
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.coverage.xml]
+output = "coverage.xml"

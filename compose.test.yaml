@@ -1,0 +1,10 @@
+# Used only by pytest --integration with a generated project name and .env.
+# Retain the real Dockerfile, Percona image, initialization and health checks.
+services:
+  app:
+    image: ${TEST_APP_IMAGE:?Run make test-integration}
+    ports: !override
+      - "127.0.0.1::8000"
+  db:
+    ports:
+      - "127.0.0.1::5432"

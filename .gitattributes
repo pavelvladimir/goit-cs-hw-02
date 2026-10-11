@@ -1,0 +1,5 @@
+# Normalize text to LF in Git and on checkout; detect binary files automatically.
+* text=auto eol=lf
+
+# Always treat shell scripts as text so their shebangs work on Linux.
+*.sh text eol=lf

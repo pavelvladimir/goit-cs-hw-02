@@ -1,0 +1,8 @@
+/* Explicit visual changes approved with the accessibility update.
+   Apply to the untouched original fixture to compare the remaining design. */
+.check-button { background-color: #2e7d32; }
+.check-button:hover { background-color: #256629; }
+.response { height: auto; min-height: 3rem; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+    .response { width: auto; margin-inline: 10px; }
+}

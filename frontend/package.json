@@ -1,0 +1,55 @@
+{
+  "name": "hw02-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@12.11.2",
+  "engines": {
+    "node": ">=22.22.0 <23"
+  },
+  "scripts": {
+    "preinstall": "npx --yes only-allow@1.2.1 pnpm",
+    "dev": "pnpm generate && next dev --hostname 127.0.0.1 --port 3000",
+    "generate": "openapi-ts",
+    "build": "pnpm generate && next build && tsc --noEmit && pnpm validate:html",
+    "validate:html": "html-validate \"out/**/*.html\"",
+    "lint": "eslint . --max-warnings 0 && prettier --check .",
+    "lint:docs": "cd .. && markdownlint-cli2",
+    "lint:fix": "eslint . --fix --max-warnings 0",
+    "format": "prettier --write . && pnpm lint:fix",
+    "test": "playwright test",
+    "preview": "uv run --project .. --locked python -m http.server 4173 --bind 127.0.0.1 --directory out"
+  },
+  "dependencies": {
+    "@base-ui/react": "1.9.0",
+    "next": "16.4.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@eslint/js": "10.0.1",
+    "@hey-api/openapi-ts": "0.99.0",
+    "@playwright/test": "1.64.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "22.20.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "10.12.0",
+    "eslint-config-next": "16.4.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-import-helpers": "2.0.2",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-playwright": "2.12.1",
+    "eslint-plugin-prettier": "5.5.6",
+    "eslint-plugin-sonarjs": "4.2.2",
+    "globals": "17.13.0",
+    "html-validate": "11.16.2",
+    "markdownlint-cli2": "0.23.3",
+    "prettier": "3.9.10",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3"
+  }
+}

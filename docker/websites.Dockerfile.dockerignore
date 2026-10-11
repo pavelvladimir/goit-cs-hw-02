@@ -1,0 +1,14 @@
+# This allowlist replaces the root .dockerignore for both Bash image targets.
+**
+!pyproject.toml
+!uv.lock
+!.python-version
+!check_websites.sh
+!docker/
+docker/**
+!docker/init-app-role.sh
+!tests/
+tests/**
+!tests/bash/
+tests/bash/**
+!tests/bash/*.py

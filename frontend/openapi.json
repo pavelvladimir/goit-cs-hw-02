@@ -1,0 +1,150 @@
+{
+  "components": {
+    "schemas": {
+      "HealthCheckError": {
+        "description": "Помилка контрольного запиту без внутрішніх деталей з'єднання.",
+        "properties": {
+          "detail": {
+            "description": "Причина невдалої перевірки: помилка БД або відсутність результату.",
+            "enum": [
+              "Error connecting to the database",
+              "Database is not configured correctly"
+            ],
+            "examples": [
+              "Error connecting to the database",
+              "Database is not configured correctly"
+            ],
+            "title": "Detail",
+            "type": "string"
+          }
+        },
+        "required": [
+          "detail"
+        ],
+        "title": "HealthCheckError",
+        "type": "object"
+      },
+      "HealthCheckResponse": {
+        "description": "Успішне виконання контрольного запиту до бази даних.",
+        "properties": {
+          "message": {
+            "const": "Welcome to FastAPI!",
+            "description": "Повідомлення про успішне підключення та виконання SELECT 1.",
+            "examples": [
+              "Welcome to FastAPI!"
+            ],
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "HealthCheckResponse",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "\nДомашнє завдання до модуля **«Основи операційних систем»**.\n\nЗастосунок працює у distroless-контейнері та підключається до\n**Percona PostgreSQL 17** через SQLAlchemy.\n\n- **GET /healthchecker** виконує `SELECT 1` у базі даних. Відповідь `200`\n  підтверджує успішне виконання цього запиту на момент перевірки.\n- **GET /** повертає HTML-сторінку з кнопкою «Перевірити БД».\n\nДля перевірки API розгорніть **GET /healthchecker**, натисніть\n**Try it out → Execute** та порівняйте відповідь із прикладами нижче.\nПараметри й авторизація не потрібні. Запит не змінює дані.\n\nФормат OpenAPI доступний за [посиланням /openapi.json](/openapi.json).\n",
+    "summary": "Перевірка підключення FastAPI до PostgreSQL у Docker Compose.",
+    "title": "goit-cs-hw-02 | FastAPI & PostgreSQL",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Повертає HTML-сторінку з кнопкою «Перевірити БД». Натискання кнопки викликає GET /healthchecker та відображає успішний результат або помилку. Завантаження самої сторінки не перевіряє підключення до бази даних.",
+        "operationId": "show_homepage",
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {
+                "examples": {
+                  "page_fragment": {
+                    "description": "Скорочений приклад повної HTML-сторінки.",
+                    "summary": "Фрагмент HTML-сторінки",
+                    "value": "<button type=\"button\">Перевірити БД</button>"
+                  }
+                },
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "HTML-сторінка для перевірки підключення до PostgreSQL."
+          }
+        },
+        "summary": "Відкрити сторінку перевірки БД",
+        "tags": [
+          "Web"
+        ]
+      }
+    },
+    "/healthchecker": {
+      "get": {
+        "description": "Виконує SQL-запит `SELECT 1` через сесію SQLAlchemy. Повертає `200` і повідомлення `Welcome to FastAPI!`, якщо запит завершився успішно та повернув рядок. Помилка з'єднання або виконання SQL повертає `500` з повідомленням `Error connecting to the database`. Якщо результат порожній, повертає `500` з повідомленням `Database is not configured correctly`. Дані в базі не змінюються.",
+        "operationId": "check_database",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "database_available": {
+                    "summary": "База даних доступна",
+                    "value": {
+                      "message": "Welcome to FastAPI!"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HealthCheckResponse"
+                }
+              }
+            },
+            "description": "Контрольний SQL-запит успішно повернув результат."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "database_unavailable": {
+                    "summary": "Помилка з'єднання або SQL-запиту",
+                    "value": {
+                      "detail": "Error connecting to the database"
+                    }
+                  },
+                  "empty_result": {
+                    "summary": "SQL-запит не повернув результату",
+                    "value": {
+                      "detail": "Database is not configured correctly"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HealthCheckError"
+                }
+              }
+            },
+            "description": "Контрольний SQL-запит завершився помилкою або не повернув рядка."
+          }
+        },
+        "summary": "Перевірити підключення до PostgreSQL",
+        "tags": [
+          "Database"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "Перевірка з'єднання з PostgreSQL та виконання SQL-запиту.",
+      "name": "Database"
+    },
+    {
+      "description": "Вебсторінка для ручної перевірки підключення до БД.",
+      "name": "Web"
+    }
+  ]
+}
