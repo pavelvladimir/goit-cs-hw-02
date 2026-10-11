@@ -1,0 +1,4 @@
+/* Preflight makes buttons inherit the page font. The original WebKit/Firefox
+   button used a platform font; Arial is already the page and Chromium font.
+   Keep this expected normalization separate from the original fixture. */
+.check-button { font-family: inherit; }

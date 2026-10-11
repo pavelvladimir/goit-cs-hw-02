@@ -1,0 +1,92 @@
+@layer reset, base, components;
+@import 'tailwindcss/preflight.css' layer(reset);
+
+@layer base {
+  body {
+    /* Preserve the existing page spacing and typography after Preflight. */
+    margin: 8px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    line-height: normal;
+    background: linear-gradient(to right, #ffefba, #ffffff);
+  }
+
+  p {
+    margin-block: 1em;
+  }
+
+  a {
+    color: #0000ee;
+    text-decoration: underline;
+  }
+
+  a:visited {
+    color: #551a8b;
+  }
+}
+
+@layer components {
+  .main-text {
+    margin: 100px 0 0;
+    font-size: 1.5rem;
+    font-weight: normal;
+    color: #333;
+    overflow-wrap: anywhere;
+  }
+
+  .check-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .check-button:hover {
+    background-color: #256629;
+  }
+
+  .check-button:focus-visible {
+    outline: 3px solid #173d1b;
+    outline-offset: 3px;
+  }
+
+  .check-button[aria-disabled='true'] {
+    cursor: wait;
+  }
+
+  .response {
+    margin: 20px auto;
+    padding: 10px;
+    border-radius: 5px;
+    color: darkslategray;
+    font-size: 1rem;
+    font-weight: bolder;
+    /* Include the original 10px padding on each side with border-box sizing. */
+    width: calc(40% + 20px);
+    min-height: calc(3rem + 20px);
+    overflow-wrap: anywhere;
+    max-width: 620px;
+    display: flex; /* Використовує flexbox для центрування */
+    justify-content: center; /* Центрує вміст по горизонталі */
+    align-items: center; /* Центрує вміст по вертикалі */
+  }
+
+  .success {
+    background-color: #90ee90; /* light green */
+  }
+
+  .error {
+    background-color: #ffcccb; /* light red */
+  }
+
+  @media (max-width: 600px) {
+    .response {
+      width: auto;
+      margin-inline: 10px;
+    }
+  }
+}
